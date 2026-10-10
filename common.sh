@@ -78,4 +78,4 @@ check_and_scan() {
     elif ! diff -q "$last" "$new" > /dev/null; then
         scan_directory "$dir" "$mal"
         cp "$new" "$last"  
-fi}
+    fi}
