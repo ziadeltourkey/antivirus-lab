@@ -4,7 +4,6 @@ malicious_dir ?= malicious_dir
 interval ?= 5
 
 .PHONY: run restore setup clean
-
 # default target: start the antivirus daemon
 run: setup
 	./antivirusd.sh $(dir) $(malicious_dir) $(interval)
