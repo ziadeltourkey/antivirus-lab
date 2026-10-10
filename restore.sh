@@ -7,18 +7,18 @@ if [ $# -ne 2 ]; then
     exit 1
 fi
 
-DIR="$1"
-MAL_DIR="$2"
+dir="$1"
+malicious_dir="$2"
 
-[ -d "$DIR" ]     || { echo "Error: '$DIR' is not a directory" >&2; exit 1; }
-[ -d "$MAL_DIR" ] || { echo "Error: '$MAL_DIR' is not a directory" >&2; exit 1; }
+[ -d "$dir" ]     || { echo "Error: '$dir' is not a directory" >&2; exit 1; }
+[ -d "$malicious_dir" ] || { echo "Error: '$malicious_dir' is not a directory" >&2; exit 1; }
 
 source "$(cd "$(dirname "$0")" && pwd)/common.sh"
 
 while true; do
     # hna bnbuild ellist of files elly btb2a mwgooda sa3tha felquar
     files=()
-    for f in "$MAL_DIR"/*; do
+    for f in "$malicious_dir"/*; do
         [ -f "$f" ] && files+=("$(basename "$f")")
     done
 
@@ -43,23 +43,23 @@ while true; do
     file="${files[$((choice-1))]}"
     echo
     echo "Selected: $file"
-    echo "  1) restore this file back into $DIR (false positive)"
+    echo "  1) restore this file back into $dir (false positive)"
     echo "  2) permanently delete this file (genuinely malicious)"
     echo "  3) leave it as-is and go back to the list"
     read -r -p "your choice [1-3]: " action || exit 0
 
     case "$action" in
         1)
-            if [ -e "$DIR/$file" ]; then
-                echo "can't restore: $DIR/$file already exists"
+            if [ -e "$dir/$file" ]; then
+                echo "can't restore: $dir/$file already exists"
             else
                 # Whitelist (name + content hash) BEFORE moving so the daemon skips it
-                echo "$(file_hash "$MAL_DIR/$file")  $file" >> "$WHITELIST"
-                mv -- "$MAL_DIR/$file" "$DIR/$file"
-                echo "restored $file to $DIR"
+                echo "$(file_hash "$malicious_dir/$file")  $file" >> "$whitelist_file"
+                mv -- "$malicious_dir/$file" "$dir/$file"
+                echo "restored $file to $dir"
             fi ;;
         2)
-            rm -f -- "$MAL_DIR/$file"
+            rm -f -- "$malicious_dir/$file"
             echo "$file permanently deleted" ;;
         3) ;;
         *)

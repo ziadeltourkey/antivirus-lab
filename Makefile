@@ -1,24 +1,24 @@
-# elvariables momken yb2o overridden: hn3ml run DIR=/some/path w el interval=2
-DIR ?= test_dir
-MALICIOUS_DIR ?= malicious_dir
-INTERVAL ?= 5
+# elvariables momken yb2o overridden: hn3ml run dir=/some/path w el interval=2
+dir ?= test_dir
+malicious_dir ?= malicious_dir
+interval ?= 5
 
 .PHONY: run restore setup clean
 
 # default target: start the antivirus daemon
 run: setup
-	./antivirusd.sh $(DIR) $(MALICIOUS_DIR) $(INTERVAL)
+	./antivirusd.sh $(dir) $(malicious_dir) $(interval)
 
 # hn run elrestore tool
 restore: setup
-	./restore.sh $(DIR) $(MALICIOUS_DIR)
+	./restore.sh $(dir) $(malicious_dir)
 
 # hena hn5li el scripts executable
 # whn create directories if missing
 setup:
 	chmod +x antivirusd.sh restore.sh antivirus-cron.sh common.sh
-	mkdir -p $(MALICIOUS_DIR)
-	mkdir -p $(DIR)
+	mkdir -p $(malicious_dir)
+	mkdir -p $(dir)
 
 # remove snapshot files
 clean:

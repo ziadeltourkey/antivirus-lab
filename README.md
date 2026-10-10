@@ -41,12 +41,12 @@ sudo systemctl enable --now cron
 
 ## 3. Running
 
-Defaults: `DIR=test_dir`, `MALICIOUS_DIR=malicious_dir`, `INTERVAL=5`. Override on the command line.
+Defaults: `dir=test_dir`, `malicious_dir=malicious_dir`, `interval=5`. Override on the command line.
 
 **Antivirus daemon** (Ctrl+C to stop):
 ```bash
 make                       # same as: make run
-make run DIR=/path/to/dir MALICIOUS_DIR=/path/to/quarantine INTERVAL=3
+make run dir=/path/to/dir malicious_dir=/path/to/quarantine interval=3
 # or directly:
 ./antivirusd.sh test_dir malicious_dir 5
 ```
@@ -70,7 +70,7 @@ mkdir -p test_dir
 echo "hello" > test_dir/ok.txt
 echo "this has a Trojan" > test_dir/notes.txt
 touch test_dir/setup.exe
-make run INTERVAL=2        # notes.txt and setup.exe get quarantined
+make run interval=2        # notes.txt and setup.exe get quarantined
 ```
 
 ## 4. Where the flagged lists are defined
@@ -78,8 +78,8 @@ make run INTERVAL=2        # notes.txt and setup.exe get quarantined
 Both are at the top of **`common.sh`**:
 
 ```bash
-FLAGGED_EXTENSIONS=(".exe" ".bat" ".vbs" ".scr" ".ps1")
-FLAGGED_KEYWORDS=("virus" "trojan" "malware" "worm" "ransomware")
+flagged_extensions=(".exe" ".bat" ".vbs" ".scr" ".ps1")
+flagged_keywords=("virus" "trojan" "malware" "worm" "ransomware")
 ```
 Extensions are matched against the end of the filename; keywords are matched case-insensitively in the file content (`grep -i`).
 
@@ -108,7 +108,7 @@ Explanation: `31 0` = 00:31; the 3rd Friday always falls on day 15 to 21, so `15
 
 ## 6. Bonus 2: Whitelist
 
-- **File:** `whitelist.txt` in the same folder as the scripts (override with the `WHITELIST` env variable). It persists across daemon restarts because it is a plain file.
+- **File:** `whitelist.txt` in the same folder as the scripts (override with the `whitelist_file` env variable). It persists across daemon restarts because it is a plain file.
 - **How a file gets added:** when you choose option 1 (restore) in `restore.sh`, before moving the file back it appends the line `<sha256 hash>  <filename>` to `whitelist.txt`.
 - **How the daemon checks it:** in `scan_directory` (`common.sh`), before the malicious checks, `is_whitelisted` computes the file's SHA-256 and looks for the exact line `<hash>  <filename>` with `grep -qxF`. If found, the file is skipped.
 - Because the content hash is stored, if a whitelisted file is later modified, it will be scanned again.

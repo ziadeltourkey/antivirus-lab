@@ -5,14 +5,14 @@ if [ $# -ne 2 ]; then
     exit 1
 fi
 
-DIR="$1"
-MAL_DIR="$2"
+dir="$1"
+malicious_dir="$2"
 
-[ -d "$DIR" ] || { echo "Error: '$DIR' is not a directory" >&2; exit 1; }
-mkdir -p "$MAL_DIR" || exit 1
+[ -d "$dir" ] || { echo "Error: '$dir' is not a directory" >&2; exit 1; }
+mkdir -p "$malicious_dir" || exit 1
 
 # elcron hna byrun mn unpredictable cwd f 34an kda m5lyin elsnapshots gamb elscripts
-STATE_DIR="$(cd "$(dirname "$0")" && pwd)"
-source "$STATE_DIR/common.sh"
+state_dir="$(cd "$(dirname "$0")" && pwd)"
+source "$state_dir/common.sh"
 
-check_and_scan "$DIR" "$MAL_DIR"
+check_and_scan "$dir" "$malicious_dir"
