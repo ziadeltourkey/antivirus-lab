@@ -60,9 +60,9 @@ scan_directory() {
         is_whitelisted "$file" && continue    # by3dy elsafe files
 
         if is_malicious "$file"; then
-            echo "$name is malicious and it is DELETED"       # 1) print
-            if cp -- "$file" "$malicious_dir/$name"; then               # 2) copy
-                rm -f -- "$file"                              # 3) delete (only if copy worked)
+            echo "$name is malicious and it is DELETED" # 1) print
+            if cp -- "$file" "$malicious_dir/$name"; then # 2) copy
+                rm -f -- "$file" # 3) delete (only if copy worked)
             else
                 echo "ERROR: could not copy $name to $malicious_dir, not deleting it" >&2
             fi
