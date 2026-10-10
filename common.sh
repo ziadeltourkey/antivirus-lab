@@ -62,7 +62,10 @@ scan_directory() {
                 rm -f -- "$file"                              # 3) delete (only if copy worked)
             else
                 echo "ERROR: could not copy $name to $mal, not deleting it" >&2
-            fi fi done}
+            fi
+        fi
+    done
+}
 
 # hna ana ba5od elsnapshots w bkarenha bb3d
 check_and_scan() {
