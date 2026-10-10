@@ -1,114 +1,92 @@
-# Simple Antivirus Daemon (Shell + Makefile)
+# Simple Antivirus Daemon
 
-A simplified antivirus written in Bash. A daemon polls a directory, and when it changes, scans it for malicious files, copies them into a quarantine directory, and deletes the originals. A restore tool lets you review quarantined files. Includes the cron and whitelist bonuses.
+This project is a small antivirus written in bash. It watches a folder, and when something changes in it, it scans the files. Any file that looks malicious is copied to a quarantine folder and deleted from the original folder. There is also a restore script to review the quarantined files.
 
-> Assumption (from the lab): the monitored directory contains only files, no subdirectories.
+The monitored folder must contain only files (no subfolders).
 
-## 1. Overview and folder hierarchy
+## Files in the project
 
-```
-.
-├── antivirusd.sh        # Part 1: daemon (loops forever with sleep)
-├── restore.sh           # Part 2: interactive restore/delete tool
-├── common.sh            # shared functions + flagged lists + whitelist logic
-├── antivirus-cron.sh    # Bonus 1: one-shot scan for cron
-├── Makefile             # Part 3: run / restore / setup targets
-├── README.md            # this file
-├── whitelist.txt        # created automatically by restore.sh (Bonus 2)
-├── directory-info.last  # created at runtime: previous directory snapshot
-└── directory-info.new   # created at runtime: current directory snapshot
-```
+    antivirus-lab/
+    |-- antivirusd.sh        the antivirus daemon
+    |-- restore.sh           the restore tool
+    |-- common.sh            functions shared between the scripts
+    |-- antivirus-cron.sh    the cron version of the daemon (bonus 1)
+    |-- Makefile             to run everything with make
+    |-- README.md            this file
 
-How it works:
-1. The daemon runs `ls -l dir > directory-info.new` every `interval-secs`.
-2. It compares that with `directory-info.last` using `diff`.
-3. First run (no `.last` file) or a difference -> scan `dir`, then `cp directory-info.new directory-info.last`. No difference -> wait and repeat.
-4. For each malicious file it prints `<file> is malicious and it is DELETED`, copies it to `malicious_dir`, and deletes the original.
+These files are created while running: `directory-info.last`, `directory-info.new` and `whitelist.txt`.
 
-(Note: deleting files changes the listing, so one extra harmless scan may run right after a quarantine. It finds nothing and the snapshots then match.)
+## How it works
 
-## 2. Prerequisites (Linux)
+1. The daemon runs `ls -l` on the folder and saves it in `directory-info.new`.
+2. It compares it with `directory-info.last` using `diff`.
+3. If this is the first run, or the two files are different, it scans the folder and then copies `directory-info.new` to `directory-info.last`.
+4. If they are the same, it just waits and checks again.
+5. For each malicious file it prints `<file> is malicious and it is DELETED`, copies it to `malicious_dir`, and deletes the original.
 
-```bash
-sudo apt update
-sudo apt install -y bash make coreutils grep diffutils
-```
-Most of these are already installed. For Bonus 1 you also need `cron`:
-```bash
-sudo apt install -y cron
-sudo systemctl enable --now cron
-```
+## Prerequisites (Ubuntu)
 
-## 3. Running
+Bash, grep, diff and sha256sum are already installed on Ubuntu. I only need make (and cron for the bonus):
 
-Defaults: `dir=test_dir`, `malicious_dir=malicious_dir`, `interval=5`. Override on the command line.
+    sudo apt update
+    sudo apt install make cron
 
-**Antivirus daemon** (Ctrl+C to stop):
-```bash
-make                       # same as: make run
-make run dir=/path/to/dir malicious_dir=/path/to/quarantine interval=3
-# or directly:
-./antivirusd.sh test_dir malicious_dir 5
-```
-The `setup` pre-build step runs automatically: it makes scripts executable and creates `malicious_dir` (and `dir`) if missing.
+## How to run
 
-**Restore tool** (do not run at the same time as the daemon):
-```bash
-make restore
-# or: ./restore.sh test_dir malicious_dir
-```
-Pick a file by number, then choose:
-- `1` restore to `dir` (false positive) -> prints `Restored <file> to <dir>.`
-- `2` permanently delete -> prints `<file> permanently deleted.`
-- `3` leave it and go back to the list
+Antivirus daemon (press Ctrl+C to stop it):
 
-If quarantine is empty it prints `No malicious files to review.` Enter `q` to quit.
+    make run
 
-**Quick test:**
-```bash
-mkdir -p test_dir
-echo "hello" > test_dir/ok.txt
-echo "this has a Trojan" > test_dir/notes.txt
-touch test_dir/setup.exe
-make run interval=2        # notes.txt and setup.exe get quarantined
-```
+The default values are `dir=test_dir`, `malicious_dir=malicious_dir` and `interval=5`. They can be changed like this:
 
-## 4. Where the flagged lists are defined
+    make run dir=my_folder malicious_dir=my_quarantine interval=3
 
-Both are at the top of **`common.sh`**:
+Restore tool (do not run it at the same time as the daemon):
 
-```bash
-flagged_extensions=(".exe" ".bat" ".vbs" ".scr" ".ps1")
-flagged_keywords=("virus" "trojan" "malware" "worm" "ransomware")
-```
-Extensions are matched against the end of the filename; keywords are matched case-insensitively in the file content (`grep -i`).
+    make restore
 
-## 5. Bonus 1: Cron job
+It shows the quarantined files with numbers. I pick a file by its number, then choose:
+- 1: restore the file back to the folder (it was a false positive)
+- 2: delete the file permanently
+- 3: leave it and go back to the list
 
-`antivirus-cron.sh dir malicious_dir` performs one check-and-scan pass (same logic as the daemon, no loop). Its snapshot files are stored next to the scripts because cron's working directory is unpredictable.
+Before running, the Makefile creates `malicious_dir` if it does not exist (the `setup` target).
 
-**Prerequisites:** cron installed and running (`sudo systemctl status cron`), scripts executable (`make setup`), and the monitored directory existing. Always use **absolute paths**.
+## Where the flagged lists are
 
-**Steps:**
-1. `cd` into the project and note the path with `pwd` (e.g. `/home/zisa/antivirus-lab`).
-2. `make setup`
-3. Open your crontab: `crontab -e`
-4. Cron only has minute resolution, so to run at **second 23** of every minute, wait 23 seconds before the script:
-   ```
-   * * * * * sleep 23; /home/zisa/antivirus-lab/antivirus-cron.sh /home/zisa/antivirus-lab/test_dir /home/zisa/antivirus-lab/malicious_dir >> /home/zisa/antivirus-cron.log 2>&1
-   ```
-5. Save and exit. Verify with `crontab -l`, and watch `tail -f ~/antivirus-cron.log`.
-6. To remove it, run `crontab -e` and delete the line.
+At the top of `common.sh`:
 
-**Every 3rd Friday of the month at 12:31 am:**
-```
-31 0 15-21 * * [ "$(date +\%u)" = 5 ] && /home/zisa/antivirus-lab/antivirus-cron.sh /home/zisa/antivirus-lab/test_dir /home/zisa/antivirus-lab/malicious_dir
-```
-Explanation: `31 0` = 00:31; the 3rd Friday always falls on day 15 to 21, so `15-21` is the day-of-month. In cron, if both day-of-month and day-of-week are restricted they are OR-ed, so day-of-week is left as `*` and the `date +%u` test (5 = Friday) enforces Friday. The `%` is escaped as `\%` because cron treats a bare `%` as a newline.
+    flagged_extensions=(".exe" ".bat" ".vbs" ".scr" ".ps1")
+    flagged_keywords=("virus" "trojan" "malware" "worm" "ransomware")
 
-## 6. Bonus 2: Whitelist
+## Bonus 1: Cron job
 
-- **File:** `whitelist.txt` in the same folder as the scripts (override with the `whitelist_file` env variable). It persists across daemon restarts because it is a plain file.
-- **How a file gets added:** when you choose option 1 (restore) in `restore.sh`, before moving the file back it appends the line `<sha256 hash>  <filename>` to `whitelist.txt`.
-- **How the daemon checks it:** in `scan_directory` (`common.sh`), before the malicious checks, `is_whitelisted` computes the file's SHA-256 and looks for the exact line `<hash>  <filename>` with `grep -qxF`. If found, the file is skipped.
-- Because the content hash is stored, if a whitelisted file is later modified, it will be scanned again.
+`antivirus-cron.sh` does one check and scan, and then it ends. Cron runs it every minute.
+
+Before starting:
+- cron must be installed and running: `sudo apt install cron` then `sudo systemctl enable --now cron`
+- the scripts must be executable: `make setup`
+- use full paths (not relative paths) in the cron line
+
+Steps:
+1. Open the crontab: `crontab -e`
+2. Add this line at the end (change the paths to yours):
+
+        * * * * * sleep 23; /home/zisa/antivirus-lab/antivirus-cron.sh /home/zisa/antivirus-lab/test_dir /home/zisa/antivirus-lab/malicious_dir >> /home/zisa/antivirus-cron.log 2>&1
+
+3. Save and exit, then check with `crontab -l`.
+4. Put a bad file in the folder and wait about 1.5 minutes. The result is written in `antivirus-cron.log`.
+
+Cron cannot run on a second, it only knows minutes. So the job starts at second 0 and `sleep 23` makes the script start at second 23.
+
+Cron expression to run it every 3rd Friday of the month at 12:31 am:
+
+    31 0 15-21 * * [ "$(date +\%u)" = 5 ] && /home/zisa/antivirus-lab/antivirus-cron.sh /home/zisa/antivirus-lab/test_dir /home/zisa/antivirus-lab/malicious_dir
+
+The 3rd Friday is always between day 15 and day 21 of the month. If I write both the day of the month and the day of the week in cron, it runs when either one matches, so I only put the days 15-21 and check that today is Friday with `date +%u` (5 means Friday). The `%` has a backslash before it because cron treats `%` in a special way.
+
+## Bonus 2: Whitelist
+
+- When I restore a file with option 1 in `restore.sh`, the script saves the file hash (sha256) and the file name in `whitelist.txt`. This file stays after stopping the daemon, so it is remembered when the daemon starts again.
+- When the daemon scans, it calculates the hash of each file and looks for the hash and the name in `whitelist.txt` (function `is_whitelisted` in `common.sh`). If they are found, the file is skipped and not flagged.
+- If a whitelisted file is changed later, its hash changes, so it will be scanned again.
