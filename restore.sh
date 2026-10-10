@@ -3,15 +3,15 @@
 # bst5dmo fi ./restore.sh dir malicious_dir
 
 if [ $# -ne 2 ]; then
-    echo "Usage: $0 dir malicious_dir" >&2
+    echo "usage: $0 dir malicious_dir" >&2
     exit 1
 fi
 
 dir="$1"
 malicious_dir="$2"
 
-[ -d "$dir" ]     || { echo "Error: '$dir' is not a directory" >&2; exit 1; }
-[ -d "$malicious_dir" ] || { echo "Error: '$malicious_dir' is not a directory" >&2; exit 1; }
+[ -d "$dir" ]     || { echo "error: '$dir' isn't a directory" >&2; exit 1; }
+[ -d "$malicious_dir" ] || { echo "error: '$malicious_dir' isn't a directory" >&2; exit 1; }
 
 source "$(cd "$(dirname "$0")" && pwd)/common.sh"
 
@@ -32,20 +32,20 @@ while true; do
     for i in "${!files[@]}"; do
         echo "  $((i+1))) ${files[$i]}"
     done
-    read -r -p "Pick a file number (or q to quit): " choice || exit 0   
+    read -r -p "pick a file number (or q to quit): " choice || exit 0   
 
     [ "$choice" = "q" ] && exit 0
     if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt ${#files[@]} ]; then
-        echo "Invalid choice."
+        echo "invalid choice."
         continue
     fi
 
     file="${files[$((choice-1))]}"
     echo
     echo "Selected: $file"
-    echo "  1) restore this file back into $dir (false positive)"
-    echo "  2) permanently delete this file (genuinely malicious)"
-    echo "  3) leave it as-is and go back to the list"
+    echo "  1) this file restore it into $dir (false positive)"
+    echo "  2) delete this file permanently (genuinely malicious)"
+    echo "  3) leave it as-is & go back to the list"
     read -r -p "your choice [1-3]: " action || exit 0
 
     case "$action" in
@@ -60,9 +60,9 @@ while true; do
             fi ;;
         2)
             rm -f -- "$malicious_dir/$file"
-            echo "$file permanently deleted" ;;
+            echo "$file deleted  permanently" ;;
         3) ;;
         *)
-            echo "invalid option" ;;
+            echo "option invalid" ;;
     esac
 done
