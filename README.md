@@ -95,14 +95,14 @@ Extensions are matched against the end of the filename; keywords are matched cas
 3. Open your crontab: `crontab -e`
 4. Cron only has minute resolution, so to run at **second 23** of every minute, wait 23 seconds before the script:
    ```
-   * * * * * sleep 23; /home/zisa/antivirus-lab/antivirus-cron.sh /home/zisa/test_dir /home/zisa/malicious_dir >> /home/zisa/antivirus-cron.log 2>&1
+   * * * * * sleep 23; /home/zisa/antivirus-lab/antivirus-cron.sh /home/zisa/antivirus-lab/test_dir /home/zisa/antivirus-lab/malicious_dir >> /home/zisa/antivirus-cron.log 2>&1
    ```
 5. Save and exit. Verify with `crontab -l`, and watch `tail -f ~/antivirus-cron.log`.
 6. To remove it, run `crontab -e` and delete the line.
 
 **Every 3rd Friday of the month at 12:31 am:**
 ```
-31 0 15-21 * * [ "$(date +\%u)" = 5 ] && /home/zisa/antivirus-lab/antivirus-cron.sh /home/zisa/test_dir /home/zisa/malicious_dir
+31 0 15-21 * * [ "$(date +\%u)" = 5 ] && /home/zisa/antivirus-lab/antivirus-cron.sh /home/zisa/antivirus-lab/test_dir /home/zisa/antivirus-lab/malicious_dir
 ```
 Explanation: `31 0` = 00:31; the 3rd Friday always falls on day 15 to 21, so `15-21` is the day-of-month. In cron, if both day-of-month and day-of-week are restricted they are OR-ed, so day-of-week is left as `*` and the `date +%u` test (5 = Friday) enforces Friday. The `%` is escaped as `\%` because cron treats a bare `%` as a newline.
 
