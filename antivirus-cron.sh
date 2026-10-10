@@ -1,5 +1,5 @@
 #!/bin/bash
-
+##hna bncron elantivirus
 if [ $# -ne 2 ]; then
     echo "Usage: $0 dir malicious_dir" >&2
     exit 1
