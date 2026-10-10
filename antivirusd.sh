@@ -3,7 +3,7 @@
 # bnst5dmo fi ./antivirusd.sh dir malicious_dir interval-secs
 #very imp
 if [ $# -ne 3 ]; then
-    echo "Usage: $0 dir malicious_dir interval-secs" >&2
+    echo "usage: $0 dir malicious_dir interval-secs" >&2
     exit 1
 fi
 
@@ -11,8 +11,8 @@ dir="$1"
 malicious_dir="$2"
 interval="$3"
 
-[ -d "$dir" ] || { echo "Error: '$dir' is not a directory" >&2; exit 1; }
-[[ "$interval" =~ ^[1-9][0-9]*$ ]] || { echo "Error: interval-secs must be a positive integer" >&2; exit 1; }
+[ -d "$dir" ] || { echo "error: '$dir' isn't a directory" >&2; exit 1; }
+[[ "$interval" =~ ^[1-9][0-9]*$ ]] || { echo "error: interval-secs must be a positive integer" >&2; exit 1; }
 mkdir -p "$malicious_dir" || exit 1
 
 source "$(cd "$(dirname "$0")" && pwd)/common.sh"
