@@ -1,6 +1,6 @@
 #!/bin/bash
 # hna elcommon.sh byshare elfunctions l antivirusd.sh w antivirus-cron.sh
-# hna ana mb3ml4 run directly; hya 7aga sourced mn elscripts eltania.
+# hna ana mb3ml4 run directly..hya 7aga sourced mn elscripts eltania.
 
 # di b2a elflagged lists "required" the only place they live <3
 flagged_extensions=(".exe" ".bat" ".vbs" ".scr" ".ps1")
