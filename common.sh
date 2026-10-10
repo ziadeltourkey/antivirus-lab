@@ -20,8 +20,7 @@ shopt -s dotglob nullglob
 
 # hna bnprint elthe SHA-256 hash of a file
 file_hash() {
-    sha256sum "$1" | cut -d' ' -f1
-}
+    sha256sum "$1" | cut -d' ' -f1 }
 
 # succeeds if the file"same name AND same content" is whitelisted
 is_whitelisted() {
@@ -29,8 +28,7 @@ is_whitelisted() {
     [ -f "$WHITELIST" ] || return 1
     name="$(basename "$file")"
     hash="$(file_hash "$file")"
-    grep -qxF -- "$hash  $name" "$WHITELIST"
-}
+    grep -qxF -- "$hash  $name" "$WHITELIST" }
 
 # succeeds if the file matches a flagged extension or keyword
 is_malicious() {
@@ -64,9 +62,7 @@ scan_directory() {
                 rm -f -- "$file"                              # 3) delete (only if copy worked)
             else
                 echo "ERROR: could not copy $name to $mal, not deleting it" >&2
-            fi
-        fi
-    done}
+            fi fi done}
 
 # hna ana ba5od elsnapshots w bkarenha bb3d
 check_and_scan() {
@@ -81,5 +77,4 @@ check_and_scan() {
         cp "$new" "$last"
     elif ! diff -q "$last" "$new" > /dev/null; then
         scan_directory "$dir" "$mal"
-        cp "$new" "$last"
-    fi}
+        cp "$new" "$last"  fi}
