@@ -1,6 +1,6 @@
 #!/bin/bash
-# antivirusd.sh - simple antivirus daemon
-# Usage: ./antivirusd.sh dir malicious_dir interval-secs
+# antivirusd.sh da simple antivirus daemon
+# bnst5dmo fi ./antivirusd.sh dir malicious_dir interval-secs
 
 if [ $# -ne 3 ]; then
     echo "Usage: $0 dir malicious_dir interval-secs" >&2
