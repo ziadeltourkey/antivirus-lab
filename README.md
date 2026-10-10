@@ -27,7 +27,7 @@ How it works:
 
 (Note: deleting files changes the listing, so one extra harmless scan may run right after a quarantine. It finds nothing and the snapshots then match.)
 
-## 2. Prerequisites (Ubuntu)
+## 2. Prerequisites (Linux)
 
 ```bash
 sudo apt update
