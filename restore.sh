@@ -32,7 +32,7 @@ while true; do
     for i in "${!files[@]}"; do
         echo "  $((i+1))) ${files[$i]}"
     done
-    read -r -p "Pick a file number (or q to quit): " choice || exit 0   # exit on EOF (Ctrl+D)
+    read -r -p "Pick a file number (or q to quit): " choice || exit 0   
 
     [ "$choice" = "q" ] && exit 0
     if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt ${#files[@]} ]; then
