@@ -1,6 +1,6 @@
 #!/bin/bash
-# restore.sh - review quarantined files
-# Usage: ./restore.sh dir malicious_dir
+# restore.sh by3ml review ll quarantined files
+# bnst5dmo fi ./restore.sh dir malicious_dir
 
 if [ $# -ne 2 ]; then
     echo "Usage: $0 dir malicious_dir" >&2
@@ -16,19 +16,19 @@ MAL_DIR="$2"
 source "$(cd "$(dirname "$0")" && pwd)/common.sh"
 
 while true; do
-    # Build the list of files currently in quarantine
+    # hna bnbuild ellist of files elly btb2a mwgooda sa3tha felquar
     files=()
     for f in "$MAL_DIR"/*; do
         [ -f "$f" ] && files+=("$(basename "$f")")
     done
 
     if [ ${#files[@]} -eq 0 ]; then
-        echo "No malicious files to review."
+        echo "no malicious files to review"
         exit 0
     fi
 
     echo
-    echo "Quarantined files:"
+    echo "quarantined files:"
     for i in "${!files[@]}"; do
         echo "  $((i+1))) ${files[$i]}"
     done
@@ -43,30 +43,26 @@ while true; do
     file="${files[$((choice-1))]}"
     echo
     echo "Selected: $file"
-    echo "  1) Restore this file back into $DIR (false positive)"
-    echo "  2) Permanently delete this file (genuinely malicious)"
-    echo "  3) Leave it as-is and go back to the list"
-    read -r -p "Your choice [1-3]: " action || exit 0
+    echo "  1) restore this file back into $DIR (false positive)"
+    echo "  2) permanently delete this file (genuinely malicious)"
+    echo "  3) leave it as-is and go back to the list"
+    read -r -p "your choice [1-3]: " action || exit 0
 
     case "$action" in
         1)
             if [ -e "$DIR/$file" ]; then
-                echo "Cannot restore: $DIR/$file already exists."
+                echo "can't restore: $DIR/$file already exists"
             else
                 # Whitelist (name + content hash) BEFORE moving so the daemon skips it
                 echo "$(file_hash "$MAL_DIR/$file")  $file" >> "$WHITELIST"
                 mv -- "$MAL_DIR/$file" "$DIR/$file"
-                echo "Restored $file to $DIR."
-            fi
-            ;;
+                echo "restored $file to $DIR"
+            fi ;;
         2)
             rm -f -- "$MAL_DIR/$file"
-            echo "$file permanently deleted."
-            ;;
-        3)
-            ;;
+            echo "$file permanently deleted" ;;
+        3) ;;
         *)
-            echo "Invalid option."
-            ;;
+            echo "invalid option" ;;
     esac
 done
