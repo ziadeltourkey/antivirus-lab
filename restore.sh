@@ -23,7 +23,7 @@ while true; do
     done
 
     if [ ${#files[@]} -eq 0 ]; then
-        echo "no malicious files to review"
+        echo "No malicious files to review."
         exit 0
     fi
 
@@ -56,11 +56,11 @@ while true; do
                 # Whitelist (name + content hash) BEFORE moving so the daemon skips it
                 echo "$(file_hash "$malicious_dir/$file")  $file" >> "$whitelist_file"
                 mv -- "$malicious_dir/$file" "$dir/$file"
-                echo "restored $file to $dir"
+                echo "Restored $file to $dir."
             fi ;;
         2)
             rm -f -- "$malicious_dir/$file"
-            echo "$file deleted  permanently" ;;
+            echo "$file permanently deleted." ;;
         3) ;;
         *)
             echo "option invalid" ;;
