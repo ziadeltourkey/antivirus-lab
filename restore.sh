@@ -1,6 +1,6 @@
 #!/bin/bash
 # restore.sh by3ml review ll quarantined files
-# bnst5dmo fi ./restore.sh dir malicious_dir
+# bst5dmo fi ./restore.sh dir malicious_dir
 
 if [ $# -ne 2 ]; then
     echo "Usage: $0 dir malicious_dir" >&2
