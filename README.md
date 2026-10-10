@@ -24,7 +24,7 @@ These files are created while running: `directory-info.last`, `directory-info.ne
 4. If they are the same, it just waits and checks again.
 5. For each malicious file it prints `<file> is malicious and it is DELETED`, copies it to `malicious_dir`, and deletes the original.
 
-## Prerequisites (Ubuntu)
+## Prerequisites (Linux)
 
 Bash, grep, diff and sha256sum are already installed on Ubuntu. I only need make (and cron for the bonus):
 
