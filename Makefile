@@ -1,4 +1,4 @@
-# elvariables mmken yb2o overridden: hn3ml run DIR=/some/path w el interval=2
+# elvariables momken yb2o overridden: hn3ml run DIR=/some/path w el interval=2
 DIR ?= test_dir
 MALICIOUS_DIR ?= malicious_dir
 INTERVAL ?= 5
